@@ -9,7 +9,7 @@ dependencies = [
     "pydantic==2.10.4",
     "numpy==2.2.1",
     "scipy==1.15.0",
-    "networkx==3.4.2",
+    "networkx==3.6.1",
     "matplotlib==3.10.0",
     "psutil==6.1.1",
     "websockets==14.1",
