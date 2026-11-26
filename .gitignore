@@ -1,0 +1,31 @@
+# Runtime / local environments
+.venv/
+venv/
+env/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.tsbuildinfo
+
+# Build output (reproducible via npm run build)
+frontend/dist/
+dist/
+build/
+*.egg-info/
+
+# Local data, secrets, runtime state
+data/*.db
+data/*.db-*
+data/backups/
+data/exports/
+data/reports/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,1 @@
+"""Prebuilt scientific scenarios package."""
