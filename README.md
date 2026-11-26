@@ -7,7 +7,7 @@
 
 <img src="docs/assets/ui-dashboard.png" width="860" alt="EIDOLON command centre screenshot">
 
-[![Offline-first](https://img.shields.io/badge/runtime-100%25%20offline-0f766e)](#) [![Python 3.12](https://img.shields.io/badge/backend-Python%203.12-3776ab)](#) [![React 18](https://img.shields.io/badge/frontend-React%2018-61dafb)](#) [![Vite 6.4.5](https://img.shields.io/badge/build-Vite%206.4.5-646cff)](#) [![Tests 18/18](https://img.shields.io/badge/tests-18%2F18%20passing-16a34a)](#) [![0 advisories](https://img.shields.io/badge/npm%20audit-0%20vulnerabilities-16a34a)](#) [![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-b91c1c)](#-legal--restrictions)
+[![Offline-first](https://img.shields.io/badge/runtime-100%25%20offline-0f766e)](#) [![Python 3.12](https://img.shields.io/badge/backend-Python%203.12-3776ab)](#) [![React 18](https://img.shields.io/badge/frontend-React%2018-61dafb)](#) [![Vite 6.4.5](https://img.shields.io/badge/build-Vite%206.4.5-646cff)](#) [![Tests 22/22](https://img.shields.io/badge/tests-22%2F22%20passing-16a34a)](#) [![0 advisories](https://img.shields.io/badge/npm%20audit-0%20vulnerabilities-16a34a)](#) [![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-b91c1c)](#-legal--restrictions)
 
 > [!IMPORTANT]
 > **© 2026 Satya Narayan Sahu. All rights reserved.**
@@ -265,7 +265,7 @@ ws.onmessage = e => {
 ## Verification & performance
 
 ```bash
-PYTHONPATH=backend .venv/bin/python -m pytest -q   # 15 backend tests
+PYTHONPATH=backend .venv/bin/python -m pytest -q   # 19 backend tests
 npm --prefix frontend test                          # 3 frontend tests
 npm --prefix frontend run build                     # tsc -b && vite build
 npm --prefix frontend audit                         # 0 vulnerabilities
@@ -276,7 +276,7 @@ npm --prefix frontend audit                         # 0 vulnerabilities
 | Mean tick latency | ~25 ms |
 | Last tick latency | ~33 ms |
 | Theoretical throughput | ~40 ticks/s |
-| Toolchain | Python 3.12 · Vite 6.4.5 · Vitest 4.1.12 · postcss 8.5.33 |
+| Toolchain | Python 3.12 · pytest 9.0.3 · Vite 6.4.5 · Vitest 4.1.12 · postcss 8.5.33 |
 | Dependency advisories | **0** (npm audit) |
 
 Benchmark variants (100 / 500 / 1000 / 5000 agents): `PYTHONPATH=backend .venv/bin/python backend/tests/benchmark.py`.
@@ -301,7 +301,9 @@ data/         local SQLite DB, exported bundles, reports, backups (git-ignored)
 
 </details>
 
-Docs: [architecture](docs/architecture.md) · [mathematics](docs/mathematical_model.md) · [manual](docs/user_manual.md) · [developer](docs/developer_guide.md) · [offline install](docs/installation_offline.md) · [SBOM](SBOM.md)
+Docs: [architecture](docs/architecture.md) · [mathematics](docs/mathematical_model.md) · [manual](docs/user_manual.md) · [developer](docs/developer_guide.md) · [offline install](docs/installation_offline.md) · [SBOM](SBOM.md) · [security policy](SECURITY.md)
+
+Security posture: loopback-only CORS and WebSocket origins, restricted methods/headers, sanitised download paths, SHA-256 snapshot verification, pinned dependencies and weekly Dependabot checks for both npm and pip. Report vulnerabilities privately via [SECURITY.md](SECURITY.md).
 
 ---
 

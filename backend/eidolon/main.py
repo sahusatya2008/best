@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+from urllib.parse import urlparse
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,19 +33,42 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Offline-first: only loopback browsers may call the API cross-origin.
+# Override with a comma-separated list if a local tool needs another origin.
+ALLOWED_ORIGINS = [o.strip() for o in os.getenv("EIDOLON_ALLOWED_ORIGINS", "").split(",") if o.strip()]
+LOCAL_ORIGIN_REGEX = r"^https?://(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=None if ALLOWED_ORIGINS else LOCAL_ORIGIN_REGEX,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
+
+
+def _origin_allowed(origin: str | None) -> bool:
+    """Accept non-browser clients and loopback origins only (CSWSH defence)."""
+    if not origin:
+        return True
+    if ALLOWED_ORIGINS:
+        return origin in ALLOWED_ORIGINS
+    parsed = urlparse(origin)
+    host = (parsed.hostname or "").lower()
+    return parsed.scheme in {"http", "https", "ws", "wss"} and host in {"127.0.0.1", "localhost", "::1"}
 
 app.include_router(router)
 
 
 @app.websocket("/ws/simulation")
 async def simulation_websocket(websocket: WebSocket) -> None:
+    if not _origin_allowed(websocket.headers.get("origin")):
+        # Accept only to deliver a WebSocket policy-close (1008) to browsers.
+        # No simulation state is sent before this check.
+        await websocket.accept()
+        await websocket.close(code=1008, reason="origin not allowed")
+        return
     await websocket.accept()
     mgr: SimulationManager = app.state.sim_manager
     queue = mgr.subscribe()
@@ -61,8 +86,10 @@ async def simulation_websocket(websocket: WebSocket) -> None:
             msg = await queue.get()
             await websocket.send_json(msg)
     except WebSocketDisconnect:
-        mgr.unsubscribe(queue)
+        pass
     except Exception:
+        raise
+    finally:
         mgr.unsubscribe(queue)
 
 

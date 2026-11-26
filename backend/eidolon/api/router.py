@@ -183,14 +183,23 @@ def patch_live_config(body: LiveConfigPatchRequest, request: Request) -> dict[st
     mgr = _mgr(request)
     eng = mgr.ensure_default_experiment()
     data = body.model_dump(exclude_none=True)
+    updated: dict[str, Any] = {}
     if "tick_interval_ms" in data:
         mgr.tick_interval_sec = max(0.01, data.pop("tick_interval_ms") / 1000.0)
+        updated["tick_interval_ms"] = mgr.tick_interval_sec * 1000.0
     for k, v in data.items():
+        if k == "env_event_probability":
+            if hasattr(eng.environment, "event_probability"):
+                setattr(eng.environment, "event_probability", v)
+                updated[k] = v
+            continue
         if hasattr(eng.config, k):
             setattr(eng.config, k, v)
+            updated[k] = v
         if hasattr(eng.environment, k):
             setattr(eng.environment, k, v)
-    return {"updated": data, "config": eng.config.to_dict()}
+            updated[k] = v
+    return {"updated": updated, "config": eng.config.to_dict()}
 
 
 @router.get("/agents")
